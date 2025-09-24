@@ -39,7 +39,7 @@ public class CipherDemo {
         System.out.println();
         
         // Test with alphabet characters
-        String alphabetTest = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.:;'!?";
+        String alphabetTest = CipherUtils.ALPHABET;
         System.out.println("Testing with full alphabet:");
         System.out.println("Original: " + alphabetTest);
         
