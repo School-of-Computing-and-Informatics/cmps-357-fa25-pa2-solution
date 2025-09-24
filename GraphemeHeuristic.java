@@ -10,7 +10,7 @@ import java.util.Set;
  */
 public class GraphemeHeuristic implements Heuristic {
     
-    // Common English graphemes (single letters and digraphs/trigraphs)
+    // Common English graphemes from linguistic analysis
     private static final Set<String> COMMON_GRAPHEMES = new HashSet<>();
     static {
         // Single letters
@@ -18,50 +18,76 @@ public class GraphemeHeuristic implements Heuristic {
             COMMON_GRAPHEMES.add(String.valueOf(c));
         }
         
-        // Common digraphs (two-letter combinations)
-        String[] digraphs = {
-            "th", "he", "in", "er", "an", "re", "ed", "nd", "on", "en", "at", "ou", "ea", "ha",
-            "es", "or", "ti", "to", "it", "st", "ar", "hi", "as", "te", "et", "ng", "of", "al",
-            "de", "se", "le", "sa", "si", "ar", "ve", "ra", "ld", "ur", "ch", "sh", "wh", "ph",
-            "gh", "ck", "qu", "oo", "ee", "ll", "ss", "ff", "pp", "tt", "nn", "mm", "dd", "bb",
-            "cc", "gg", "rr", "zz", "ai", "ay", "ei", "ey", "ie", "oe", "ue", "ui", "au", "aw",
-            "ew", "ow", "oy", "oi"
-        };
+        // Bigraphs (most common two-letter combinations in English)
+        String[] BIGRAPHS = {"th", "he", "in", "er", "an", "re", "on", "at", "en", "nd", "or", "te", "es", "ed", "it", "is", "al", "ar", "st", "to",
+                            "nt", "ha", "ou", "ea", "le", "ve", "se", "me", "li", "de", "co", "ra", "ro", "ma", "ne", "ic", "ca", "ta", "si",
+                            "no", "lo", "di", "el", "pe", "ri", "be", "ut", "la", "so", "fo"};
         
-        for (String digraph : digraphs) {
-            COMMON_GRAPHEMES.add(digraph);
+        for (String bigraph : BIGRAPHS) {
+            COMMON_GRAPHEMES.add(bigraph);
         }
         
-        // Common trigraphs (three-letter combinations)
-        String[] trigraphs = {
-            "the", "and", "ing", "ion", "tio", "ent", "ous", "all", "are", "ere", "her", "his",
-            "ate", "est", "for", "ght", "cha", "che", "chi", "tch", "dge", "sch"
-        };
+        // Trigraphs (most common three-letter combinations in English)
+        String[] TRIGRAPHS = {"the", "and", "ing", "ent", "ion", "her", "for", "tha", "ter", "est", "his", "nth", "ers", "ate", "ver", "all", "con",
+                             "res", "int", "com", "sto", "pro", "per", "ect", "tor", "men", "str", "tro", "tin", "der", "und", "tra", "man", "ple",
+                             "cal", "low", "por", "pre", "tio", "tan", "car", "mat", "lat", "sta", "sur", "out", "lat", "sup", "tri", "mis"};
         
-        for (String trigraph : trigraphs) {
+        for (String trigraph : TRIGRAPHS) {
             COMMON_GRAPHEMES.add(trigraph);
+        }
+        
+        // Quadrigraphs (common four-letter combinations in English)
+        String[] QUADRIGRAPHS = {"tion", "ment", "ther", "ally", "ably", "ence", "that", "with", "from", "ntly", "sion", "tive", "form", "ship", "able",
+                                "here", "more", "ness", "over", "self", "ward", "less", "some", "stan", "tant", "hand", "port", "tend", "just", "list",
+                                "fore", "ward", "side", "seem", "make", "year", "stat", "come", "rate", "part", "term", "test", "turn", "head",
+                                "need", "kind", "case", "open", "true"};
+        
+        for (String quadrigraph : QUADRIGRAPHS) {
+            COMMON_GRAPHEMES.add(quadrigraph);
         }
     }
     
-    // Expected frequencies for common graphemes (rough estimates)
+    // Expected frequencies for common graphemes (approximate percentages)
     private static final Map<String, Double> GRAPHEME_FREQUENCIES = new HashMap<>();
     static {
+        // Single letters
         GRAPHEME_FREQUENCIES.put("e", 12.0);
         GRAPHEME_FREQUENCIES.put("t", 9.1);
-        GRAPHEME_FREQUENCIES.put("a", 8.1);
+        GRAPHEME_FREQUENCIES.put("a", 8.2);
         GRAPHEME_FREQUENCIES.put("o", 7.5);
         GRAPHEME_FREQUENCIES.put("i", 7.0);
         GRAPHEME_FREQUENCIES.put("n", 6.7);
         GRAPHEME_FREQUENCIES.put("s", 6.3);
         GRAPHEME_FREQUENCIES.put("h", 6.1);
         GRAPHEME_FREQUENCIES.put("r", 6.0);
+        
+        // Bigraphs
         GRAPHEME_FREQUENCIES.put("th", 3.5);
         GRAPHEME_FREQUENCIES.put("he", 3.0);
         GRAPHEME_FREQUENCIES.put("in", 2.5);
         GRAPHEME_FREQUENCIES.put("er", 2.0);
         GRAPHEME_FREQUENCIES.put("an", 1.8);
+        GRAPHEME_FREQUENCIES.put("re", 1.6);
+        GRAPHEME_FREQUENCIES.put("on", 1.5);
+        GRAPHEME_FREQUENCIES.put("at", 1.4);
+        GRAPHEME_FREQUENCIES.put("en", 1.3);
+        GRAPHEME_FREQUENCIES.put("nd", 1.2);
+        
+        // Trigraphs
+        GRAPHEME_FREQUENCIES.put("the", 1.8);
+        GRAPHEME_FREQUENCIES.put("and", 1.2);
         GRAPHEME_FREQUENCIES.put("ing", 1.5);
-        GRAPHEME_FREQUENCIES.put("the", 1.2);
+        GRAPHEME_FREQUENCIES.put("her", 0.9);
+        GRAPHEME_FREQUENCIES.put("for", 0.8);
+        GRAPHEME_FREQUENCIES.put("ent", 0.7);
+        GRAPHEME_FREQUENCIES.put("ion", 0.6);
+        
+        // Quadrigraphs
+        GRAPHEME_FREQUENCIES.put("tion", 0.8);
+        GRAPHEME_FREQUENCIES.put("ment", 0.5);
+        GRAPHEME_FREQUENCIES.put("that", 0.4);
+        GRAPHEME_FREQUENCIES.put("with", 0.4);
+        GRAPHEME_FREQUENCIES.put("ther", 0.3);
     }
     
     private String lastSummary = "";

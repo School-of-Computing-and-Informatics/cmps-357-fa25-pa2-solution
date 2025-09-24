@@ -8,101 +8,209 @@ import java.util.StringTokenizer;
  */
 public class DictionaryHeuristic implements Heuristic {
     
-    // Basic English dictionary (subset of common words)
+    // Extended Basic English dictionary from Wiktionary (1995 words with 3+ letters)
     private static final Set<String> DICTIONARY = new HashSet<>();
     static {
-        // Common English words - this would ideally be loaded from the Extended Basic English wordlist
         String[] words = {
-            "a", "about", "all", "also", "and", "as", "at", "be", "because", "but", "by", "can",
-            "come", "could", "day", "do", "even", "find", "first", "for", "from", "get", "give",
-            "go", "have", "he", "her", "here", "him", "his", "how", "i", "if", "in", "into", "is",
-            "it", "its", "just", "know", "like", "look", "make", "man", "many", "me", "more", "my",
-            "new", "no", "not", "now", "of", "on", "one", "only", "or", "other", "our", "out",
-            "over", "say", "see", "she", "so", "some", "take", "than", "that", "the", "their",
-            "them", "there", "these", "they", "think", "this", "time", "to", "two", "up", "use",
-            "very", "want", "water", "way", "we", "well", "were", "what", "when", "which", "who",
-            "will", "with", "would", "write", "you", "your", "people", "may", "down", "been",
-            "call", "who", "oil", "sit", "set", "had", "let", "must", "big", "high", "such", "follow",
-            "act", "why", "ask", "men", "change", "went", "light", "kind", "off", "need", "house",
-            "picture", "try", "us", "again", "animal", "point", "mother", "world", "near", "build",
-            "self", "earth", "father", "head", "stand", "own", "page", "should", "country", "found",
-            "answer", "school", "grow", "study", "still", "learn", "plant", "cover", "food", "sun",
-            "four", "between", "state", "keep", "eye", "never", "last", "let", "thought", "city",
-            "tree", "cross", "farm", "hard", "start", "might", "story", "saw", "far", "sea", "draw",
-            "left", "late", "run", "dont", "while", "press", "close", "night", "real", "life",
-            "few", "north", "book", "carry", "took", "science", "eat", "room", "friend", "began",
-            "idea", "fish", "mountain", "stop", "once", "base", "hear", "horse", "cut", "sure",
-            "watch", "color", "face", "wood", "main", "enough", "plain", "girl", "usual", "young",
-            "ready", "above", "ever", "red", "list", "though", "feel", "talk", "bird", "soon",
-            "body", "dog", "family", "direct", "leave", "song", "measure", "door", "product", "black",
-            "short", "numeral", "class", "wind", "question", "happen", "complete", "ship", "area",
-            "half", "rock", "order", "fire", "south", "problem", "piece", "told", "knew", "pass",
-            "since", "top", "whole", "king", "space", "heard", "best", "hour", "better", "during",
-            "hundred", "five", "remember", "step", "early", "hold", "west", "ground", "interest",
-            "reach", "fast", "verb", "sing", "listen", "six", "table", "travel", "less", "morning",
-            "ten", "simple", "several", "vowel", "toward", "war", "lay", "against", "pattern",
-            "slow", "center", "love", "person", "money", "serve", "appear", "road", "map", "rain",
-            "rule", "govern", "pull", "cold", "notice", "voice", "unit", "power", "town", "fine",
-            "certain", "fly", "fall", "lead", "cry", "dark", "machine", "note", "wait", "plan",
-            "figure", "star", "box", "noun", "field", "rest", "correct", "able", "pound", "done",
-            "beauty", "drive", "stood", "contain", "front", "teach", "week", "final", "gave",
-            "green", "oh", "quick", "develop", "ocean", "warm", "free", "minute", "strong",
-            "special", "mind", "behind", "clear", "tail", "produce", "fact", "street", "inch",
-            "multiply", "nothing", "course", "stay", "wheel", "full", "force", "blue", "object",
-            "decide", "surface", "deep", "moon", "island", "foot", "system", "busy", "test",
-            "record", "boat", "common", "gold", "possible", "plane", "stead", "dry", "wonder",
-            "laugh", "thousands", "ago", "ran", "check", "game", "shape", "equate", "miss",
-            "brought", "heat", "snow", "tire", "bring", "yes", "distant", "fill", "east", "paint",
-            "language", "among", "grand", "ball", "yet", "wave", "drop", "heart", "am", "present",
-            "heavy", "dance", "engine", "position", "arm", "wide", "sail", "material", "size",
-            "vary", "settle", "speak", "weight", "general", "ice", "matter", "circle", "pair",
-            "include", "divide", "syllable", "felt", "perhaps", "pick", "sudden", "count", "square",
-            "reason", "length", "represent", "art", "subject", "region", "energy", "hunt",
-            "probable", "bed", "brother", "egg", "ride", "cell", "believe", "fraction", "forest",
-            "sit", "race", "window", "store", "summer", "train", "sleep", "prove", "lone", "leg",
-            "exercise", "wall", "catch", "mount", "wish", "sky", "board", "joy", "winter", "sat",
-            "written", "wild", "instrument", "kept", "glass", "grass", "cow", "job", "edge", "sign",
-            "visit", "past", "soft", "fun", "bright", "gas", "weather", "month", "million", "bear",
-            "finish", "happy", "hope", "flower", "clothe", "strange", "gone", "jump", "baby", "eight",
-            "village", "meet", "root", "buy", "raise", "solve", "metal", "whether", "push", "seven",
-            "paragraph", "third", "shall", "held", "hair", "describe", "cook", "floor", "either",
-            "result", "burn", "hill", "safe", "cat", "century", "consider", "type", "law", "bit",
-            "coast", "copy", "phrase", "silent", "tall", "sand", "soil", "roll", "temperature",
-            "finger", "industry", "value", "fight", "lie", "beat", "excite", "natural", "view",
-            "sense", "ear", "else", "quite", "broke", "case", "middle", "kill", "son", "lake",
-            "moment", "scale", "loud", "spring", "observe", "child", "straight", "consonant",
-            "nation", "dictionary", "milk", "speed", "method", "organ", "pay", "age", "section",
-            "dress", "cloud", "surprise", "quiet", "stone", "tiny", "climb", "bad", "oil", "blood",
-            "touch", "grew", "cent", "mix", "team", "wire", "cost", "lost", "brown", "wear", "garden",
-            "equal", "sent", "choose", "fell", "fit", "flow", "fair", "bank", "collect", "save",
-            "control", "decimal", "gentle", "woman", "captain", "practice", "separate", "difficult",
-            "doctor", "please", "protect", "noon", "whose", "locate", "ring", "character", "insect",
-            "caught", "period", "indicate", "radio", "spoke", "atom", "human", "history", "effect",
-            "electric", "expect", "crop", "modern", "element", "hit", "student", "corner", "party",
-            "supply", "bone", "rail", "imagine", "provide", "agree", "thus", "capital", "wont",
-            "chair", "danger", "fruit", "rich", "thick", "soldier", "process", "operate", "guess",
-            "necessary", "sharp", "wing", "create", "neighbor", "wash", "bat", "rather", "crowd",
-            "corn", "compare", "poem", "string", "bell", "depend", "meat", "rub", "tube", "famous",
-            "dollar", "stream", "fear", "sight", "thin", "triangle", "planet", "hurry", "chief",
-            "colony", "clock", "mine", "tie", "enter", "major", "fresh", "search", "send", "yellow",
-            "gun", "allow", "print", "dead", "spot", "desert", "suit", "current", "lift", "rose",
-            "continue", "block", "chart", "hat", "sell", "success", "company", "subtract", "event",
-            "particular", "deal", "swim", "term", "opposite", "wife", "shoe", "shoulder", "spread",
-            "arrange", "camp", "invent", "cotton", "born", "determine", "quart", "nine", "truck",
-            "noise", "level", "chance", "gather", "shop", "stretch", "throw", "shine", "property",
-            "column", "molecule", "select", "wrong", "gray", "repeat", "require", "broad", "prepare",
-            "salt", "nose", "plural", "anger", "claim", "continent", "oxygen", "sugar", "death",
-            "pretty", "skill", "women", "season", "solution", "magnet", "silver", "thank", "branch",
-            "match", "suffix", "especially", "fig", "afraid", "huge", "sister", "steel", "discuss",
-            "forward", "similar", "guide", "experience", "score", "apple", "bought", "led", "pitch",
-            "coat", "mass", "card", "band", "rope", "slip", "win", "dream", "evening", "condition",
-            "feed", "tool", "total", "basic", "smell", "valley", "nor", "double", "seat", "arrive",
-            "master", "track", "parent", "shore", "division", "sheet", "substance", "favor",
-            "connect", "post", "spend", "chord", "fat", "glad", "original", "share", "station",
-            "dad", "bread", "charge", "proper", "bar", "offer", "segment", "slave", "duck",
-            "instant", "market", "degree", "populate", "chick", "dear", "enemy", "reply", "drink",
-            "occur", "support", "speech", "nature", "range", "steam", "motion", "path", "liquid",
-            "log", "meant", "quotient", "teeth", "shell", "neck"
+            "able", "about", "absence", "absorption", "acceleration", "acceptance", "accessory", "accident", "account", "acid"
+            , "across", "act", "acting", "active", "actor", "addition", "address", "adjacent", "adjustment", "adventure"
+            , "advertisement", "advice", "after", "afterthought", "again", "against", "age", "agency", "agent", "ago"
+            , "agreement", "air", "airplane", "alcohol", "algebra", "all", "allowance", "almost", "along", "also"
+            , "alternative", "aluminum", "always", "ambition", "ammonia", "among", "amount", "amplitude", "amusement", "anchor"
+            , "and", "anesthetic", "angle", "angry", "animal", "ankle", "another", "answer", "ant", "any"
+            , "anybody", "anyhow", "anyone", "anything", "anywhere", "apparatus", "appendage", "apple", "application", "approval"
+            , "approximation", "april", "arbitrary", "arbitration", "arc", "arch", "area", "argument", "arithmetic", "arm"
+            , "army", "arrangement", "art", "asbestos", "ash", "asset", "assistant", "attack", "attempt", "attention"
+            , "attraction", "august", "authority", "autobus", "automatic", "automobile", "average", "awake", "awkward", "axis"
+            , "baby", "back", "backbone", "backwoods", "bad", "bag", "balance", "balcony", "bale", "ball"
+            , "ballet", "band", "bang", "bank", "bankrupt", "bar", "bark", "barrel", "base", "based"
+            , "basic", "basin", "basing", "basket", "bath", "beak", "beaker", "beard", "beat", "beautiful"
+            , "because", "become", "bed", "bedroom", "bee", "beef", "beer", "beeswax", "before", "behavior"
+            , "behind", "belief", "bell", "belt", "bent", "berry", "bet", "between", "bill", "biology"
+            , "bird", "birth", "birthday", "birthright", "bit", "bite", "bitter", "black", "blackberry", "blackbird"
+            , "blackboard", "blade", "blame", "blanket", "blood", "bloodvessel", "blow", "blue", "bluebell", "board"
+            , "boat", "body", "boiling", "bomb", "bone", "book", "bookkeeper", "boot", "both", "bottle"
+            , "bottom", "box", "boy", "brain", "brake", "branch", "brass", "brave", "bread", "break"
+            , "breakfast", "breast", "breath", "brick", "bridge", "bright", "broken", "broker", "brother", "brown"
+            , "brush", "brushwood", "bubble", "bucket", "bud", "budget", "builder", "building", "bulb", "bunch"
+            , "buoyancy", "burial", "burn", "burned", "burner", "burning", "burst", "business", "busy", "but"
+            , "butter", "buttercup", "button", "cafe", "cake", "calculation", "calendar", "call", "camera", "canvas"
+            , "capacity", "capital", "card", "cardboard", "care", "carefree", "caretaker", "carpet", "carriage", "cart"
+            , "carter", "cartilage", "case", "cast", "cat", "catarrh", "cause", "cave", "cavity", "cell"
+            , "centi", "ceremony", "certain", "certificate", "chain", "chair", "chalk", "champagne", "chance", "change"
+            , "character", "charge", "chauffeur", "cheap", "check", "cheese", "chemical", "chemist", "chemistry", "chest"
+            , "chief", "child", "chimney", "chin", "china", "chocolate", "choice", "chorus", "church", "cigarette"
+            , "circle", "circuit", "circulation", "circumference", "circus", "citron", "civilization", "claim", "claw", "clay"
+            , "clean", "clear", "cleavage", "clever", "client", "climber", "clip", "clock", "clockwork", "cloth"
+            , "clothier", "clothing", "cloud", "club", "coal", "coat", "cocktail", "code", "coffee", "cognac"
+            , "coil", "cold", "collar", "collection", "college", "collision", "colony", "color", "column", "comb"
+            , "combination", "combine", "come", "comfort", "committee", "common", "commonsense", "communications", "company", "comparison"
+            , "competition", "complaint", "complete", "complex", "component", "compound", "concept", "concrete", "condition", "conductor"
+            , "congruent", "connection", "conscious", "conservation", "consignment", "constant", "consumer", "continuous", "contour", "control"
+            , "convenient", "conversion", "cook", "cooked", "cooker", "cooking", "cool", "copper", "copy", "copyright"
+            , "cord", "cork", "corner", "correlation", "corrosion", "cost", "cotton", "cough", "country", "court"
+            , "cover", "cow", "crack", "credit", "creeper", "crime", "crop", "cross", "cruel", "crush"
+            , "cry", "crying", "cunning", "cup", "cupboard", "current", "curtain", "curve", "cushion", "cusp"
+            , "customs", "cut", "damage", "damping", "dance", "dancer", "dancing", "danger", "dark", "date"
+            , "daughter", "day", "daylight", "dead", "dear", "death", "debit", "debt", "december", "deci"
+            , "decision", "deck", "decrease", "deep", "defect", "deficiency", "deflation", "degenerate", "degree", "delicate"
+            , "delivery", "demand", "denominator", "density", "department", "dependent", "deposit", "desert", "design", "designer"
+            , "desire", "destruction", "detail", "determining", "development", "dew", "diameter", "difference", "different", "difficulty"
+            , "digestion", "dike", "dilution", "dinner", "dip", "direct", "direction", "dirty", "disappearance", "discharge"
+            , "discount", "discovery", "discussion", "disease", "disgrace", "disgust", "dislike", "dissipation", "distance", "distribution"
+            , "disturbance", "ditch", "dive", "division", "divisor", "divorce", "dog", "doll", "domesticating", "dominion"
+            , "door", "doubt", "down", "downfall", "drain", "drawer", "dreadful", "dream", "dress", "dressing"
+            , "drink", "drive", "driver", "drop", "dropped", "dropper", "dry", "duck", "duct", "dull"
+            , "dust", "duster", "duty", "dynamite", "each", "ear", "early", "earth", "earthwork", "east"
+            , "easy", "eat", "economy", "edge", "education", "effect", "efficiency", "effort", "egg", "eight"
+            , "either", "elastic", "electric", "electricity", "eleven", "elimination", "embassy", "empire", "employer", "empty"
+            , "encyclopedia", "end", "enemy", "energy", "engine", "engineer", "enough", "envelope", "environment", "envy"
+            , "equal", "equation", "erosion", "error", "eruption", "evaporation", "even", "evening", "event", "ever"
+            , "every", "everybody", "everyday", "everyone", "everything", "everywhere", "exact", "example", "exchange", "excitement"
+            , "exercise", "existence", "expansion", "experience", "experiment", "expert", "explanation", "explosion", "export", "expression"
+            , "extinction", "eye", "eyeball", "eyebrow", "eyelash", "face", "fact", "factor", "failure", "fair"
+            , "fall", "false", "family", "famous", "fan", "far", "farm", "farmer", "fastening", "fat"
+            , "father", "fatherland", "fault", "fear", "feather", "february", "feeble", "feeling", "female", "ferment"
+            , "fertile", "fertilizing", "fever", "few", "fiber", "fiction", "field", "fifteen", "fifth", "fifty"
+            , "figure", "fin", "financial", "find", "finger", "fingerprint", "fire", "firearm", "firefly", "fireman"
+            , "fireplace", "firework", "fired", "firing", "first", "fish", "fisher", "fisherman", "fixed", "flag"
+            , "flame", "flash", "flask", "flat", "flesh", "flight", "flint", "flood", "floor", "flour"
+            , "flow", "flower", "fly", "focus", "fold", "folder", "foliation", "food", "foolish", "foot"
+            , "football", "footlights", "footman", "footnote", "footprint", "footstep", "for", "force", "forecast", "forehead"
+            , "foreign", "forgiveness", "fork", "form", "forward", "four", "fourteen", "fourth", "forty", "fowl"
+            , "fraction", "fracture", "frame", "free", "frequent", "fresh", "friction", "friday", "friend", "from"
+            , "front", "frost", "frozen", "fruit", "full", "fume", "funnel", "funny", "fur", "furnace"
+            , "furniture", "fusion", "future", "garden", "gardener", "gas", "gasworks", "gate", "general", "generation"
+            , "geography", "geology", "geometry", "germ", "germinating", "get", "gill", "girl", "give", "glacier"
+            , "gland", "glass", "glove", "glycerin", "god", "gold", "goldfish", "good", "government", "grain"
+            , "gram", "grand", "grass", "grateful", "grating", "gravel", "great", "grease", "green", "grey"
+            , "gray", "grief", "grip", "grocery", "groove", "gross", "ground", "group", "growth", "guarantee"
+            , "guard", "guess", "guide", "gum", "gun", "gunboat", "gunmetal", "gunpowder", "habit", "hair"
+            , "half", "hammer", "hand", "handbook", "handkerchief", "handle", "handwriting", "hanging", "hanger", "happy"
+            , "harbor", "hard", "harmony", "hat", "hate", "have", "head", "headdress", "headland", "headstone"
+            , "headway", "healthy", "hearing", "heart", "heat", "heater", "heated", "heating", "heavy", "hedge"
+            , "help", "here", "hereafter", "herewith", "high", "highlands", "highway", "hill", "himself", "hinge"
+            , "hire", "hiss", "history", "hold", "hole", "holiday", "hollow", "home", "honest", "honey"
+            , "hoof", "hook", "hope", "horn", "horse", "horseplay", "horsepower", "hospital", "host", "hotel"
+            , "hour", "hourglass", "house", "houseboat", "housekeeper", "how", "however", "human", "humor", "hundred"
+            , "hunt", "hurry", "hurt", "husband", "hyena", "hygiene", "hysteria", "ice", "idea", "igneous"
+            , "ill", "image", "imagination", "imperial", "import", "important", "impulse", "impurity", "inasmuch", "inclusion"
+            , "income", "increase", "index", "individual", "indoors", "industry", "inferno", "inflation", "infinity", "influenza"
+            , "inheritance", "ink", "inland", "inlet", "inner", "innocent", "input", "insect", "inside", "instep"
+            , "institution", "instrument", "insulator", "insurance", "integer", "intelligent", "intercept", "interest", "international", "interpretation"
+            , "intersection", "into", "intrusion", "invention", "investigation", "investment", "inverse", "invitation", "iron", "island"
+            , "itself", "jam", "january", "jaw", "jazz", "jealous", "jelly", "jerk", "jewel", "jeweler"
+            , "join", "joiner", "joint", "journey", "judge", "jug", "juice", "july", "jump", "june"
+            , "jury", "justice", "keep", "keeper", "kennel", "kettle", "key", "kick", "kidney", "kill"
+            , "kilo", "kind", "king", "kiss", "kitchen", "knee", "knife", "knock", "knot", "knowledge"
+            , "lace", "lag", "lake", "lame", "lamp", "land", "landmark", "landslip", "language", "large"
+            , "last", "late", "latitude", "laugh", "laughing", "lava", "law", "lawyer", "layer", "lazy"
+            , "lead", "leaf", "learn", "learner", "learning", "least", "leather", "left", "leg", "legal"
+            , "length", "lens", "less", "lesson", "let", "letter", "level", "lever", "liability", "library"
+            , "license", "lid", "life", "lift", "light", "lighthouse", "like", "lime", "limestone", "limit"
+            , "line", "linen", "link", "lip", "liquid", "liqueur", "list", "liter", "little", "live"
+            , "liver", "living", "load", "loan", "local", "lock", "locker", "locking", "locus", "long"
+            , "longitude", "look", "loose", "loss", "loud", "love", "low", "luck", "lump", "lunch"
+            , "lung", "machine", "macaroni", "madam", "magic", "magnetic", "magnitude", "make", "malaria", "male"
+            , "man", "manager", "manhole", "mania", "manner", "many", "map", "marble", "march", "margin"
+            , "mark", "marked", "market", "marriage", "married", "mass", "mast", "match", "material", "mathematics"
+            , "mattress", "mature", "may", "meal", "mean", "meaning", "measure", "meat", "medical", "medicine"
+            , "medium", "meet", "meeting", "melt", "member", "memory", "mess", "message", "metabolism", "metal"
+            , "meter", "meow", "micro", "microscope", "middle", "military", "milk", "mill", "milli", "million"
+            , "mind", "mine", "miner", "mineral", "minute", "microscope", "mist", "mixed", "mixture", "model"
+            , "modern", "modest", "momentum", "monday", "money", "monkey", "monopoly", "month", "mood", "moon"
+            , "moral", "more", "morning", "most", "mother", "motion", "mountain", "moustache", "mouth", "move"
+            , "much", "mud", "multiple", "multiplication", "murder", "muscle", "museum", "music", "myself", "nail"
+            , "name", "narrow", "nasty", "nation", "natural", "nature", "navy", "near", "neat", "necessary"
+            , "neck", "need", "needle", "neglect", "neighbor", "nerve", "nest", "net", "network", "neutron"
+            , "new", "news", "newspaper", "next", "nice", "nickel", "nicotine", "night", "nine", "nobody"
+            , "node", "noise", "normal", "north", "nose", "nostril", "not", "note", "noted", "nothing"
+            , "november", "now", "nowhere", "nucleus", "number", "numerator", "nurse", "nut", "observation", "obedient"
+            , "off", "offer", "office", "officer", "oil", "old", "olive", "omelet", "once", "one"
+            , "oncoming", "oneself", "onlooker", "only", "onto", "open", "opera", "operation", "opinion", "opium"
+            , "opposite", "orange", "orchestra", "order", "ore", "organ", "organism", "organization", "origin", "ornament"
+            , "orphanage", "other", "out", "outburst", "outcome", "outcrop", "outcry", "outdoor", "outgoing", "outhouse"
+            , "outlaw", "outlet", "outline", "outlier", "outlook", "output", "outside", "outskirts", "outstretched", "over"
+            , "overacting", "overall", "overbalancing", "overbearing", "overcoat", "overcome", "overdo", "overdressed", "overfull", "overhanging"
+            , "overhead", "overland", "overleaf", "overlap", "overloud", "overseas", "overseer", "overshoe", "overstatement", "overtake"
+            , "overtaxed", "overtime", "overturned", "overuse", "overvalued", "oval", "oven", "overweight", "overworking", "own"
+            , "owner", "oxidation", "page", "pain", "paint", "painter", "painting", "pajamas", "pan", "paper"
+            , "paragraph", "paraffin", "paradise", "parallel", "parcel", "parent", "park", "part", "particle", "partner"
+            , "parting", "party", "passage", "passport", "past", "paste", "path", "patience", "patent", "payment"
+            , "peace", "pedal", "pen", "pencil", "pendulum", "penguin", "pension", "people", "perfect", "person"
+            , "petal", "petroleum", "phonograph", "physical", "physics", "physiology", "piano", "picture", "pig", "pin"
+            , "pincushion", "pipe", "piston", "place", "plain", "plan", "plane", "plaster", "plate", "platinum"
+            , "play", "played", "playing", "plaything", "please", "pleased", "pleasure", "plug", "plough", "plow"
+            , "pocket", "poetry", "point", "pointer", "pointing", "poison", "police", "policeman", "polish", "political"
+            , "pollen", "pool", "poor", "population", "porcelain", "porter", "position", "possible", "post", "postman"
+            , "postmark", "postmaster", "postoffice", "pot", "potash", "potato", "potter", "powder", "power", "practice"
+            , "praise", "prayer", "present", "president", "pressure", "price", "prick", "priest", "prime", "prince"
+            , "princess", "print", "printer", "prison", "prisoner", "private", "probability", "probable", "problem", "process"
+            , "produce", "producer", "product", "profit", "program", "progress", "projectile", "projection", "promise", "proof"
+            , "propaganda", "property", "prose", "protest", "proud", "psychology", "public", "pull", "pulley", "pump"
+            , "punishment", "pupil", "purchase", "pure", "purr", "purpose", "push", "put", "pyramid", "quality"
+            , "quantity", "quarter", "queen", "question", "quick", "quiet", "quinine", "quite", "quack", "quotient"
+            , "race", "radiation", "radio", "radium", "rail", "rain", "raining", "range", "rat", "rate"
+            , "ratio", "ray", "reaction", "read", "reader", "reading", "ready", "reagent", "real", "reason"
+            , "receipt", "receiver", "reciprocal", "record", "rectangle", "recurring", "red", "reference", "referendum", "reflux"
+            , "regret", "regular", "reinforcement", "relation", "relative", "religion", "remark", "remedy", "rent", "repair"
+            , "representative", "reproduction", "repulsion", "request", "resistance", "residue", "resolution", "respect", "responsible", "rest"
+            , "restaurant", "result", "retail", "revenge", "reversible", "reward", "rheumatism", "rhythm", "rice", "rich"
+            , "right", "rigidity", "ring", "rise", "rival", "river", "road", "rock", "rod", "roll"
+            , "roller", "roof", "room", "root", "rot", "rotation", "rough", "round", "royal", "rub"
+            , "rubber", "rude", "rule", "ruler", "rum", "run", "runaway", "rust", "sac", "sad"
+            , "safe", "sail", "sailor", "salad", "sale", "salt", "same", "sample", "sand", "sardine"
+            , "satisfaction", "saturday", "saturated", "saucer", "saving", "say", "scale", "scarp", "schist", "school"
+            , "science", "scissors", "scratch", "screen", "screw", "sea", "seaman", "search", "seat", "second"
+            , "secondhand", "secret", "secretary", "secretion", "section", "security", "sedimentary", "see", "seed", "selection"
+            , "self", "selfish", "sell", "send", "sense", "sensitivity", "sentence", "sepal", "separate", "september"
+            , "serious", "serum", "servant", "service", "set", "seven", "sex", "shade", "shadow", "shake"
+            , "shale", "shame", "share", "sharp", "shave", "shear", "sheep", "sheet", "shelf", "shell"
+            , "ship", "shirt", "shock", "shocked", "shocking", "shoe", "shore", "short", "shorthand", "shoulder"
+            , "show", "shut", "side", "sideboard", "sidewalk", "sight", "sign", "silk", "sill", "silver"
+            , "similarity", "simple", "since", "sir", "sister", "six", "sixteen", "size", "skin", "skirt"
+            , "skull", "sky", "slate", "sleep", "sleeve", "slide", "slip", "slope", "slow", "small"
+            , "smash", "smell", "smile", "smoke", "smooth", "snake", "sneeze", "snow", "snowing", "soap"
+            , "social", "society", "sock", "soft", "soil", "soldier", "solid", "solution", "solvent", "some"
+            , "somebody", "someday", "somehow", "someone", "something", "sometime", "somewhat", "somewhere", "son", "song"
+            , "sorry", "sort", "sound", "soup", "south", "space", "spade", "spark", "special", "specialization"
+            , "specimen", "speculation", "spirit", "spit", "splash", "sponge", "spoon", "sport", "spot", "spring"
+            , "square", "stable", "stage", "stain", "stair", "stalk", "stamen", "stamp", "star", "start"
+            , "statement", "station", "statistics", "steady", "steam", "steamer", "steel", "stem", "step", "stick"
+            , "sticky", "stiff", "still", "stimulus", "stitch", "stocking", "stomach", "stone", "stop", "stopper"
+            , "stopping", "store", "storm", "story", "straight", "strain", "strange", "straw", "stream", "street"
+            , "strength", "stress", "stretch", "stretcher", "strike", "string", "strong", "structure", "study", "subject"
+            , "substance", "substitution", "subtraction", "success", "successive", "such", "suchlike", "sucker", "sudden", "sugar"
+            , "suggestion", "sum", "summer", "sun", "sunburn", "sunday", "sunlight", "sunshade", "supply", "support"
+            , "surface", "surgeon", "surprise", "suspension", "suspicious", "sweet", "sweetheart", "swelling", "swim", "swing"
+            , "switch", "sympathetic", "system", "table", "tail", "tailor", "take", "talk", "talking", "tall"
+            , "tame", "tap", "tapioca", "taste", "tax", "taxi", "tea", "teacher", "teaching", "tear"
+            , "telegram", "telephone", "ten", "tendency", "tent", "term", "terrace", "test", "texture", "than"
+            , "that", "the", "theater", "then", "theory", "there", "thermometer", "thick", "thickness", "thief"
+            , "thimble", "thin", "thing", "third", "thirteen", "thirty", "this", "thorax", "though", "thought"
+            , "thousand", "thread", "threat", "three", "throat", "through", "thrust", "thumb", "thunder", "thursday"
+            , "ticket", "tide", "tie", "tight", "till", "time", "tin", "tired", "tissue", "toast"
+            , "tobacco", "today", "toe", "together", "tomorrow", "tongs", "tongue", "tonight", "too", "tooth"
+            , "top", "torpedo", "total", "touch", "touching", "towel", "tower", "town", "trade", "trader"
+            , "tradesman", "traffic", "tragedy", "train", "trainer", "training", "transmission", "transparent", "transport", "trap"
+            , "travel", "tray", "treatment", "tree", "triangle", "trick", "trouble", "troubled", "troubling", "trousers"
+            , "truck", "true", "tube", "tuesday", "tune", "tunnel", "turbine", "turn", "turning", "twelve"
+            , "twenty", "twentyone", "twice", "twin", "twist", "two", "typist", "ugly", "umbrella", "unconformity"
+            , "under", "underclothing", "undercooked", "undergo", "undergrowth", "undermined", "undersigned", "undersized", "understanding", "understatement"
+            , "undertake", "undervalued", "undo", "unit", "universe", "university", "unknown", "upkeep", "uplift", "upon"
+            , "upright", "uptake", "use", "used", "valency", "valley", "value", "valve", "vanilla", "vapor"
+            , "variable", "vascular", "vegetable", "velocity", "verse", "very", "vessel", "vestigial", "victim", "victory"
+            , "view", "viewpoint", "violent", "violin", "visa", "vitamin", "vodka", "voice", "volt", "volume"
+            , "vortex", "vote", "waiter", "waiting", "walk", "wall", "war", "warm", "wash", "waste"
+            , "wasted", "watch", "water", "waterfall", "wave", "wax", "way", "weak", "weather", "wedge"
+            , "wednesday", "week", "weekend", "weight", "welcome", "well", "wellbeing", "welloff", "west", "wet"
+            , "whatever", "wheel", "when", "whenever", "where", "whereas", "whereby", "wherever", "whether", "whichever"
+            , "while", "whip", "whisky", "whistle", "white", "whitewash", "who", "whoever", "wholesale", "why"
+            , "wide", "widow", "wife", "wild", "will", "wind", "window", "windpipe", "wine", "wing"
+            , "winter", "wire", "wise", "with", "within", "without", "woman", "wood", "woodwork", "wool"
+            , "word", "work", "worker", "workhouse", "working", "world", "worm", "wound", "wreck", "wrist"
+            , "writer", "writing", "wrong", "xray", "yawn", "year", "yearbook", "yellow", "yes", "yesterday"
+            , "you", "young", "yourself", "zebra", "zinc", "zookeeper", "zoology"
         };
         
         for (String word : words) {
