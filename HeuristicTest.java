@@ -1,6 +1,13 @@
 /**
  * Test class to demonstrate the heuristics functionality
  * Shows how each heuristic analyzes different types of text
+ *
+ * Chi-squared interpretation:
+ *   - The chi-squared statistic measures how closely the letter frequency of a text matches expected English frequencies.
+ *   - Lower chi-squared values indicate a better match to English (i.e., the text is more likely to be English-like).
+ *   - Higher chi-squared values suggest the text is less like English (e.g., random or heavily scrambled text).
+ *   - In this program, the score is normalized so that a value closer to 1 means a better match to English, and closer to 0 means a poor match.
+ *   - Use the chi-squared value and the normalized score to compare how "English-like" different texts are.
  */
 public class HeuristicTest {
     
