@@ -64,7 +64,7 @@ public class BruteForceSearch {
         }
         
         // Three character keys (even more limited for performance)
-        String veryCommonLetters = "etaoin";  // Top 6 most common letters
+        String veryCommonLetters = commonLetters;//"etaoin";  // Top 6 most common letters
         for (char c1 : veryCommonLetters.toCharArray()) {
             for (char c2 : veryCommonLetters.toCharArray()) {
                 for (char c3 : veryCommonLetters.toCharArray()) {
@@ -81,7 +81,7 @@ public class BruteForceSearch {
         }
         
         // Four character keys (very limited for performance)
-        String topLetters = "eta";  // Top 3 most common letters
+        String topLetters = commonLetters;//"eta";  // Top 3 most common letters
         for (char c1 : topLetters.toCharArray()) {
             for (char c2 : topLetters.toCharArray()) {
                 for (char c3 : topLetters.toCharArray()) {
