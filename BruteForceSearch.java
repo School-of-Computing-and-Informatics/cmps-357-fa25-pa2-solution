@@ -159,18 +159,11 @@ public class BruteForceSearch {
     }
     
     /**
-     * Export the top results to output.md in the specified format
+     * Export the results for each file to output.md in the specified format
      */
-    public static void exportResults(List<DecryptionCandidate> topResults) {
+    public static void exportResults(Map<String, List<DecryptionCandidate>> resultsByFile) {
         try {
             PrintWriter writer = new PrintWriter("output.md");
-            
-            // Group results by filename
-            Map<String, List<DecryptionCandidate>> resultsByFile = new LinkedHashMap<>();
-            for (DecryptionCandidate candidate : topResults) {
-                String fileName = candidate.getFileName();
-                resultsByFile.computeIfAbsent(fileName, k -> new ArrayList<>()).add(candidate);
-            }
             
             // Write results organized by file
             for (Map.Entry<String, List<DecryptionCandidate>> entry : resultsByFile.entrySet()) {
@@ -233,7 +226,9 @@ public class BruteForceSearch {
             
             System.out.println("Found " + txtFiles.size() + " text files");
             
-            List<DecryptionCandidate> allCandidates = new ArrayList<>();
+            // Process each file separately and keep track of top 5 results per file
+            Map<String, List<DecryptionCandidate>> resultsByFile = new LinkedHashMap<>();
+            int totalCandidates = 0;
             
             // Process each file
             for (Path file : txtFiles) {
@@ -241,27 +236,29 @@ public class BruteForceSearch {
                 String content = Files.readString(file);
                 
                 List<DecryptionCandidate> fileCandidates = processFile(fileName, content);
-                allCandidates.addAll(fileCandidates);
+                totalCandidates += fileCandidates.size();
+                
+                // Sort candidates for this file by combined score (highest first)
+                fileCandidates.sort((a, b) -> Double.compare(b.getCombinedScore(), a.getCombinedScore()));
+                
+                // Get top 5 results for this file
+                List<DecryptionCandidate> topFileResults = fileCandidates.subList(0, Math.min(5, fileCandidates.size()));
+                resultsByFile.put(fileName, topFileResults);
+                
+                System.out.println("  Top 5 results for " + fileName + ":");
+                for (int i = 0; i < topFileResults.size(); i++) {
+                    DecryptionCandidate candidate = topFileResults.get(i);
+                    System.out.printf("    %d. %s [%s]: %.3f\n", 
+                                     i + 1, candidate.getCipherName(), candidate.getKey(), 
+                                     candidate.getCombinedScore());
+                }
+                System.out.println();
             }
             
-            System.out.println("\nTotal candidates generated: " + allCandidates.size());
+            System.out.println("Total candidates generated: " + totalCandidates);
             
-            // Sort by combined score (highest first)
-            allCandidates.sort((a, b) -> Double.compare(b.getCombinedScore(), a.getCombinedScore()));
-            
-            // Get top 5 results
-            List<DecryptionCandidate> topResults = allCandidates.subList(0, Math.min(5, allCandidates.size()));
-            
-            System.out.println("\nTop 5 decryption candidates:");
-            for (int i = 0; i < topResults.size(); i++) {
-                DecryptionCandidate candidate = topResults.get(i);
-                System.out.printf("%d. %s [%s] %s: %.3f\n", 
-                                 i + 1, candidate.getCipherName(), candidate.getKey(), 
-                                 candidate.getFileName(), candidate.getCombinedScore());
-            }
-            
-            // Export results
-            exportResults(topResults);
+            // Export results organized by file
+            exportResults(resultsByFile);
             
         } catch (IOException e) {
             System.err.println("Error processing files: " + e.getMessage());
