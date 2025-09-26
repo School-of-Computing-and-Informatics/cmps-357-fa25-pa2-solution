@@ -234,13 +234,14 @@ public class BruteForceSearch {
             writer.println();
             writer.println("## Timing Results");
             writer.println();
-            
+            writer.println("| File Name | Time (ms) |");
+            writer.println("|-----------|-----------|");
             int totalFiles = fileTimings.size();
             for (Map.Entry<String, Long> entry : fileTimings.entrySet()) {
-                writer.println(entry.getKey() + ", " + entry.getValue());
+                writer.printf("| %s | %d |%n", entry.getKey(), entry.getValue());
             }
-            writer.println("total_files, " + totalFiles);
-            writer.println("total_elapsed_ms, " + totalElapsedMs);
+            writer.println("| **Total Files** | **" + totalFiles + "** |");
+            writer.println("| **Total Elapsed (ms)** | **" + totalElapsedMs + "** |");
             
             writer.close();
             System.out.println("\nResults exported to output.md");
