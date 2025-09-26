@@ -25,7 +25,7 @@ public class ProgressBar {
      * Update progress with number of keys tested
      * Updates display every 1000 keys or every 100ms, whichever comes first
      */
-    public void updateProgress(int newTestedKeys) {
+    public synchronized void updateProgress(int newTestedKeys) {
         this.testedKeys = newTestedKeys;
         
         long currentTime = System.currentTimeMillis();
@@ -41,7 +41,7 @@ public class ProgressBar {
     /**
      * Force update display (used for final update)
      */
-    public void forceUpdate() {
+    public synchronized void forceUpdate() {
         updateDisplay();
     }
     

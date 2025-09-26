@@ -1,6 +1,8 @@
 import java.io.*;
 import java.nio.file.*;
 import java.util.*;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Main program that performs brute force search across all cipher types
@@ -63,7 +65,15 @@ public class BruteForceSearch {
      * Generates all possible Vigenère cipher keys (up to 4 characters as specified)
      */
     public static List<DecryptionCandidate> searchVigenere(String fileName, String cipherText) {
-        List<DecryptionCandidate> candidates = new ArrayList<>();
+        return searchVigenere(fileName, cipherText, 1); // Use single thread by default for compatibility
+    }
+    
+    /**
+     * Generates all possible Vigenère cipher keys (up to 4 characters as specified)
+     * Parallelized version that uses multiple threads
+     */
+    public static List<DecryptionCandidate> searchVigenere(String fileName, String cipherText, int numThreads) {
+        List<DecryptionCandidate> candidates = Collections.synchronizedList(new ArrayList<>());
         String alphabet = CipherUtils.ALPHABET;
         String commonLetters = "etaoinshrdlcumwfgypbvkjxqz";
         
@@ -74,64 +84,25 @@ public class BruteForceSearch {
                        (commonLetters.length() * commonLetters.length() * commonLetters.length() * commonLetters.length()); // Four character
         
         ProgressBar progressBar = new ProgressBar("Vigenère", totalKeys);
-        int testedKeys = 0;
+        AtomicInteger testedKeys = new AtomicInteger(0);
         
-        // Single character keys
-        for (char c : alphabet.toCharArray()) {
-            String key = String.valueOf(c);
-            VigenereCipher vigenere = new VigenereCipher(key);
-            String decrypted = vigenere.decrypt(cipherText);
+        // Create thread pool
+        ExecutorService executor = Executors.newFixedThreadPool(numThreads);
+        List<Future<Void>> futures = new ArrayList<>();
+        
+        // Single character keys - distribute work across threads
+        int alphabetSize = alphabet.length();
+        int singleCharBatchSize = Math.max(1, alphabetSize / numThreads);
+        
+        for (int threadId = 0; threadId < numThreads; threadId++) {
+            final int startIdx = threadId * singleCharBatchSize;
+            final int endIdx = (threadId == numThreads - 1) ? alphabetSize : Math.min((threadId + 1) * singleCharBatchSize, alphabetSize);
             
-            DecryptionCandidate candidate = new DecryptionCandidate(
-                "Vigenère", "key=" + key, fileName, cipherText, decrypted);
-            candidate.evaluate();
-            candidates.add(candidate);
-            
-            progressBar.updateProgress(++testedKeys);
-        }
-        
-        // Two character keys (limited set for performance)
-        for (char c1 : commonLetters.toCharArray()) {
-            for (char c2 : commonLetters.toCharArray()) {
-                String key = "" + c1 + c2;
-                VigenereCipher vigenere = new VigenereCipher(key);
-                String decrypted = vigenere.decrypt(cipherText);
-                
-                DecryptionCandidate candidate = new DecryptionCandidate(
-                    "Vigenère", "key=" + key, fileName, cipherText, decrypted);
-                candidate.evaluate();
-                candidates.add(candidate);
-                
-                progressBar.updateProgress(++testedKeys);
-            }
-        }
-        
-        // Three character keys (even more limited for performance)
-        String veryCommonLetters = commonLetters;
-        for (char c1 : veryCommonLetters.toCharArray()) {
-            for (char c2 : veryCommonLetters.toCharArray()) {
-                for (char c3 : veryCommonLetters.toCharArray()) {
-                    String key = "" + c1 + c2 + c3;
-                    VigenereCipher vigenere = new VigenereCipher(key);
-                    String decrypted = vigenere.decrypt(cipherText);
-                    
-                    DecryptionCandidate candidate = new DecryptionCandidate(
-                        "Vigenère", "key=" + key, fileName, cipherText, decrypted);
-                    candidate.evaluate();
-                    candidates.add(candidate);
-                    
-                    progressBar.updateProgress(++testedKeys);
-                }
-            }
-        }
-        
-        // Four character keys (very limited for performance)
-        String topLetters = commonLetters;
-        for (char c1 : topLetters.toCharArray()) {
-            for (char c2 : topLetters.toCharArray()) {
-                for (char c3 : topLetters.toCharArray()) {
-                    for (char c4 : topLetters.toCharArray()) {
-                        String key = "" + c1 + c2 + c3 + c4;
+            if (startIdx < endIdx) {
+                futures.add(executor.submit(() -> {
+                    for (int i = startIdx; i < endIdx; i++) {
+                        char c = alphabet.charAt(i);
+                        String key = String.valueOf(c);
                         VigenereCipher vigenere = new VigenereCipher(key);
                         String decrypted = vigenere.decrypt(cipherText);
                         
@@ -140,14 +111,132 @@ public class BruteForceSearch {
                         candidate.evaluate();
                         candidates.add(candidate);
                         
-                        progressBar.updateProgress(++testedKeys);
+                        progressBar.updateProgress(testedKeys.incrementAndGet());
                     }
-                }
+                    return null;
+                }));
             }
         }
         
+        // Two character keys - distribute work across threads
+        int twoCharTotal = commonLetters.length() * commonLetters.length();
+        int twoCharBatchSize = Math.max(1, twoCharTotal / numThreads);
+        
+        for (int threadId = 0; threadId < numThreads; threadId++) {
+            final int startIdx = threadId * twoCharBatchSize;
+            final int endIdx = (threadId == numThreads - 1) ? twoCharTotal : Math.min((threadId + 1) * twoCharBatchSize, twoCharTotal);
+            
+            if (startIdx < endIdx) {
+                futures.add(executor.submit(() -> {
+                    for (int idx = startIdx; idx < endIdx; idx++) {
+                        int c1Idx = idx / commonLetters.length();
+                        int c2Idx = idx % commonLetters.length();
+                        
+                        char c1 = commonLetters.charAt(c1Idx);
+                        char c2 = commonLetters.charAt(c2Idx);
+                        String key = "" + c1 + c2;
+                        
+                        VigenereCipher vigenere = new VigenereCipher(key);
+                        String decrypted = vigenere.decrypt(cipherText);
+                        
+                        DecryptionCandidate candidate = new DecryptionCandidate(
+                            "Vigenère", "key=" + key, fileName, cipherText, decrypted);
+                        candidate.evaluate();
+                        candidates.add(candidate);
+                        
+                        progressBar.updateProgress(testedKeys.incrementAndGet());
+                    }
+                    return null;
+                }));
+            }
+        }
+        
+        // Three character keys - distribute work across threads
+        int threeCharTotal = commonLetters.length() * commonLetters.length() * commonLetters.length();
+        int threeCharBatchSize = Math.max(1, threeCharTotal / numThreads);
+        
+        for (int threadId = 0; threadId < numThreads; threadId++) {
+            final int startIdx = threadId * threeCharBatchSize;
+            final int endIdx = (threadId == numThreads - 1) ? threeCharTotal : Math.min((threadId + 1) * threeCharBatchSize, threeCharTotal);
+            
+            if (startIdx < endIdx) {
+                futures.add(executor.submit(() -> {
+                    for (int idx = startIdx; idx < endIdx; idx++) {
+                        int c1Idx = idx / (commonLetters.length() * commonLetters.length());
+                        int c2Idx = (idx / commonLetters.length()) % commonLetters.length();
+                        int c3Idx = idx % commonLetters.length();
+                        
+                        char c1 = commonLetters.charAt(c1Idx);
+                        char c2 = commonLetters.charAt(c2Idx);
+                        char c3 = commonLetters.charAt(c3Idx);
+                        String key = "" + c1 + c2 + c3;
+                        
+                        VigenereCipher vigenere = new VigenereCipher(key);
+                        String decrypted = vigenere.decrypt(cipherText);
+                        
+                        DecryptionCandidate candidate = new DecryptionCandidate(
+                            "Vigenère", "key=" + key, fileName, cipherText, decrypted);
+                        candidate.evaluate();
+                        candidates.add(candidate);
+                        
+                        progressBar.updateProgress(testedKeys.incrementAndGet());
+                    }
+                    return null;
+                }));
+            }
+        }
+        
+        // Four character keys - distribute work across threads
+        int fourCharTotal = commonLetters.length() * commonLetters.length() * commonLetters.length() * commonLetters.length();
+        int fourCharBatchSize = Math.max(1, fourCharTotal / numThreads);
+        
+        for (int threadId = 0; threadId < numThreads; threadId++) {
+            final int startIdx = threadId * fourCharBatchSize;
+            final int endIdx = (threadId == numThreads - 1) ? fourCharTotal : Math.min((threadId + 1) * fourCharBatchSize, fourCharTotal);
+            
+            if (startIdx < endIdx) {
+                futures.add(executor.submit(() -> {
+                    for (int idx = startIdx; idx < endIdx; idx++) {
+                        int c1Idx = idx / (commonLetters.length() * commonLetters.length() * commonLetters.length());
+                        int c2Idx = (idx / (commonLetters.length() * commonLetters.length())) % commonLetters.length();
+                        int c3Idx = (idx / commonLetters.length()) % commonLetters.length();
+                        int c4Idx = idx % commonLetters.length();
+                        
+                        char c1 = commonLetters.charAt(c1Idx);
+                        char c2 = commonLetters.charAt(c2Idx);
+                        char c3 = commonLetters.charAt(c3Idx);
+                        char c4 = commonLetters.charAt(c4Idx);
+                        String key = "" + c1 + c2 + c3 + c4;
+                        
+                        VigenereCipher vigenere = new VigenereCipher(key);
+                        String decrypted = vigenere.decrypt(cipherText);
+                        
+                        DecryptionCandidate candidate = new DecryptionCandidate(
+                            "Vigenère", "key=" + key, fileName, cipherText, decrypted);
+                        candidate.evaluate();
+                        candidates.add(candidate);
+                        
+                        progressBar.updateProgress(testedKeys.incrementAndGet());
+                    }
+                    return null;
+                }));
+            }
+        }
+        
+        // Wait for all tasks to complete
+        try {
+            for (Future<Void> future : futures) {
+                future.get();
+            }
+        } catch (InterruptedException | ExecutionException e) {
+            System.err.println("Error during parallel execution: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            executor.shutdown();
+        }
+        
         progressBar.forceUpdate();
-        return candidates;
+        return new ArrayList<>(candidates);
     }
     
     /**
@@ -189,7 +278,7 @@ public class BruteForceSearch {
     /**
      * Process a single file with all cipher types
      */
-    public static List<DecryptionCandidate> processFile(String fileName, String content, Map<String, Long> fileTimings) {
+    public static List<DecryptionCandidate> processFile(String fileName, String content, Map<String, Long> fileTimings, int numThreads) {
         System.out.println("Processing file: " + fileName + " (length: " + content.length() + ")");
         
         Timer fileTimer = new Timer();
@@ -201,8 +290,8 @@ public class BruteForceSearch {
         List<DecryptionCandidate> caesarResults = searchCaesar(fileName, content);
         allCandidates.addAll(caesarResults);
         
-        // Search with Vigenère cipher
-        List<DecryptionCandidate> vigenereResults = searchVigenere(fileName, content);
+        // Search with Vigenère cipher (parallelized)
+        List<DecryptionCandidate> vigenereResults = searchVigenere(fileName, content, numThreads);
         allCandidates.addAll(vigenereResults);
         
         // Search with Affine cipher
@@ -276,8 +365,26 @@ public class BruteForceSearch {
     }
     
     public static void main(String[] args) {
+        // Parse command line arguments
+        int numThreads = 4; // default value
+        for (int i = 0; i < args.length; i++) {
+            if (args[i].equals("--threads") && i + 1 < args.length) {
+                try {
+                    numThreads = Integer.parseInt(args[i + 1]);
+                    if (numThreads < 1) {
+                        System.err.println("Number of threads must be at least 1");
+                        return;
+                    }
+                } catch (NumberFormatException e) {
+                    System.err.println("Invalid number of threads: " + args[i + 1]);
+                    return;
+                }
+            }
+        }
+        
         System.out.println("Brute Force Cipher Search");
         System.out.println("=========================");
+        System.out.println("Using " + numThreads + " threads for parallel processing");
         System.out.println();
         
         Timer totalTimer = new Timer();
@@ -313,7 +420,7 @@ public class BruteForceSearch {
                 String fileName = file.getFileName().toString();
                 String content = Files.readString(file);
                 
-                List<DecryptionCandidate> fileCandidates = processFile(fileName, content, fileTimings);
+                List<DecryptionCandidate> fileCandidates = processFile(fileName, content, fileTimings, numThreads);
                 totalCandidates += fileCandidates.size();
                 
                 // Sort candidates for this file by combined score (highest first)
