@@ -7,6 +7,30 @@ import java.util.*;
  * and finds the best decryptions for all text files in the INPUT directory
  */
 public class BruteForceSearch {
+    /**
+     * Returns a string with the timing rounded to the largest appropriate unit:
+     * nearest 10 ms, 1 s, 30 s, 2 min, or 10 min (whichever is largest for the value)
+     */
+    private static String approximateTime(long ms) {
+        if (ms >= 10 * 60 * 1000) { // 10 min
+            long rounded = Math.round((double) ms / (10 * 60 * 1000)) * 10;
+            return rounded + " min";
+        } else if (ms >= 2 * 60 * 1000) { // 2 min
+            long rounded = Math.round((double) ms / (2 * 60 * 1000)) * 2;
+            return rounded + " min";
+        } else if (ms >= 30 * 1000) { // 30 s
+            long rounded = Math.round((double) ms / (30 * 1000)) * 30;
+            return rounded + " s";
+        } else if (ms >= 1000) { // 1 s
+            long rounded = Math.round((double) ms / 1000);
+            return rounded + " s";
+        } else if (ms >= 10) { // 10 ms
+            long rounded = Math.round((double) ms / 10) * 10;
+            return rounded + " ms";
+        } else {
+            return ms + " ms";
+        }
+    }
     
     /**
      * Generates all possible Caesar cipher keys (all shifts from 1 to alphabet_size-1)
@@ -234,14 +258,14 @@ public class BruteForceSearch {
             writer.println();
             writer.println("## Timing Results");
             writer.println();
-            writer.println("| File Name | Time (ms) |");
-            writer.println("|-----------|-----------|");
+            writer.println("| File Name | Time (ms) | Approximate |");
+            writer.println("|-----------|-----------|-------------|");
             int totalFiles = fileTimings.size();
             for (Map.Entry<String, Long> entry : fileTimings.entrySet()) {
-                writer.printf("| %s | %d |%n", entry.getKey(), entry.getValue());
+                writer.printf("| %s | %d | %s |%n", entry.getKey(), entry.getValue(), approximateTime(entry.getValue()));
             }
-            writer.println("| **Total Files** | **" + totalFiles + "** |");
-            writer.println("| **Total Elapsed (ms)** | **" + totalElapsedMs + "** |");
+            writer.println("| **Total Files** | **" + totalFiles + "** |   |");
+            writer.printf("| **Total Elapsed (ms)** | **%d** | **%s** |%n", totalElapsedMs, approximateTime(totalElapsedMs));
             
             writer.close();
             System.out.println("\nResults exported to output.md");
