@@ -276,6 +276,71 @@ public class BruteForceSearch {
     }
     
     /**
+     * Generates Atbash cipher candidate (single result since it's deterministic)
+     */
+    public static List<DecryptionCandidate> searchAtbash(String fileName, String cipherText) {
+        List<DecryptionCandidate> candidates = new ArrayList<>();
+        
+        ProgressBar progressBar = new ProgressBar("Atbash", 1);
+        
+        AtbashCipher atbash = new AtbashCipher();
+        String decrypted = atbash.decrypt(cipherText);
+        
+        DecryptionCandidate candidate = new DecryptionCandidate(
+            "Atbash", atbash.getKey(), fileName, cipherText, decrypted);
+        candidate.evaluate();
+        candidates.add(candidate);
+        
+        progressBar.updateProgress(1);
+        progressBar.forceUpdate();
+        return candidates;
+    }
+    
+    /**
+     * Generates Playfair cipher candidates with common key patterns
+     * Uses a limited key space for reasonable runtime similar to Vigenère
+     */
+    public static List<DecryptionCandidate> searchPlayfair(String fileName, String cipherText) {
+        List<DecryptionCandidate> candidates = new ArrayList<>();
+        
+        // Use common English words and letter combinations as keys
+        String[] commonKeys = {
+            // Single letters (most common)
+            "a", "e", "t", "o", "i", "n", "s", "h", "r",
+            // Common short words  
+            "key", "the", "and", "for", "are", "but", "not", "you", "all", "can", "had", "was", "one", "our", "out", "day", "get", "has", "him", "his", "how", "its", "may", "new", "now", "old", "see", "try", "way", "who", "boy", "did", "man", "men", "put", "say", "she", "too", "use",
+            // Common cipher-related words
+            "cipher", "code", "secret", "hidden", "playfair", "keyword", "password",
+            // Letter patterns
+            "abc", "test", "hello", "world"
+        };
+        
+        int totalKeys = commonKeys.length;
+        ProgressBar progressBar = new ProgressBar("Playfair", totalKeys);
+        
+        for (int i = 0; i < commonKeys.length; i++) {
+            String key = commonKeys[i];
+            try {
+                PlayfairCipher playfair = new PlayfairCipher(key);
+                String decrypted = playfair.decrypt(cipherText);
+                
+                DecryptionCandidate candidate = new DecryptionCandidate(
+                    "Playfair", "key=" + key, fileName, cipherText, decrypted);
+                candidate.evaluate();
+                candidates.add(candidate);
+                
+                progressBar.updateProgress(i + 1);
+            } catch (Exception e) {
+                // Skip problematic keys
+                progressBar.updateProgress(i + 1);
+            }
+        }
+        
+        progressBar.forceUpdate();
+        return candidates;
+    }
+    
+    /**
      * Process a single file with all cipher types
      */
     public static List<DecryptionCandidate> processFile(String fileName, String content, Map<String, Long> fileTimings, int numThreads) {
@@ -297,6 +362,14 @@ public class BruteForceSearch {
         // Search with Affine cipher
         List<DecryptionCandidate> affineResults = searchAffine(fileName, content);
         allCandidates.addAll(affineResults);
+        
+        // Search with Atbash cipher
+        List<DecryptionCandidate> atbashResults = searchAtbash(fileName, content);
+        allCandidates.addAll(atbashResults);
+        
+        // Search with Playfair cipher
+        List<DecryptionCandidate> playfairResults = searchPlayfair(fileName, content);
+        allCandidates.addAll(playfairResults);
         
         long elapsedMs = fileTimer.getElapsedMs();
         fileTimings.put(fileName, elapsedMs);
