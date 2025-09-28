@@ -53,7 +53,8 @@ future (a learning experience).
    Use or implement publicly available decryption methods for the following ciphers:
    - Caesar cipher
    - Vigenère cipher
-   - One additional substitution cipher of your choice (for example, Affine, Playfair, Hill, Autokey, etc).
+   - **Atbash cipher** - A simple substitution cipher where each letter is mapped to its reverse in the alphabet (a↔z, b↔y, etc.)
+   - **Playfair cipher** - A digraph substitution cipher using a 5×5 key square
    
    **Note:** Exclude any ciphers that are simplifications of the first two given ciphers above. For example, ROT1, ROT13, and other Caesar cipher variants with specific shift values should not be chosen as they are well-known simplifications of the Caesar cipher.
 
@@ -115,6 +116,29 @@ future (a learning experience).
   - Score/ranking
 - For the Vigenère cipher, you can assume that the key length will be at most four characters (e.g., B, BE, BOP, Bop1, etc.).
   Similar restrictions may be assumed for any cipher with high time or memory complexity.
+
+## Implementation Details
+
+### Cipher Implementations
+This implementation includes five cipher types:
+1. **Caesar Cipher** - Shifts each character by a fixed amount (1-65 possible keys)
+2. **Vigenère Cipher** - Uses repeating key for polyalphabetic substitution (limited to 4-character keys)  
+3. **Affine Cipher** - Mathematical linear transformation E(x) = (ax + b) mod m
+4. **Atbash Cipher** - Simple reverse alphabet substitution (deterministic, no key needed)
+5. **Playfair Cipher** - Digraph substitution using 5×5 key square (65 common keys tested)
+
+### Brute Force Strategy
+- **Caesar**: Tests all 64 non-trivial shifts
+- **Vigenère**: Tests single letters + common 2-4 character combinations from frequent letters
+- **Affine**: Tests all valid coprime multiplicative keys with all additive keys  
+- **Atbash**: Single test (deterministic cipher)
+- **Playfair**: Tests 65 common English words and letter patterns as keys
+
+### Key Space Limitations
+To ensure reasonable runtime performance:
+- Playfair uses common English words, single letters, and cipher-related terms
+- Total key space across all ciphers designed to complete in similar timeframes
+- Parallel processing used for computationally intensive ciphers (Vigenère)
 
 ## Example: Caesar Cipher with Shift 7
 
