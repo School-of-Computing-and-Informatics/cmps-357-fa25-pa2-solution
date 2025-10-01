@@ -1,3 +1,7 @@
+package cmps357.pa2solution.ciphers;
+
+import cmps357.pa2solution.utils.CipherUtils;
+
 /**
  * Implementation of the Caesar cipher
  * Shifts each character by a fixed amount in the alphabet

@@ -1,3 +1,7 @@
+package cmps357.pa2solution;
+
+import cmps357.pa2solution.heuristics.*;
+
 /**
  * Test class to demonstrate the heuristics functionality
  * Shows how each heuristic analyzes different types of text

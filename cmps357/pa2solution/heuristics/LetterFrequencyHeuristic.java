@@ -1,3 +1,5 @@
+package cmps357.pa2solution.heuristics;
+
 import java.util.HashMap;
 import java.util.Map;
 

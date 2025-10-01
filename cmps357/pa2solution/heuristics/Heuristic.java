@@ -1,3 +1,5 @@
+package cmps357.pa2solution.heuristics;
+
 /**
  * Interface for text analysis heuristics used to evaluate decrypted text quality
  * Higher scores indicate better matches to expected patterns

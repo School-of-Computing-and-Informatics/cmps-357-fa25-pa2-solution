@@ -1,3 +1,7 @@
+package cmps357.pa2solution;
+
+import cmps357.pa2solution.ciphers.*;
+
 /**
  * File processing example showing how ciphers would work with the INPUT directory
  * This demonstrates the basic framework for the full assignment

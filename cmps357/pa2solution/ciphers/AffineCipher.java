@@ -1,3 +1,7 @@
+package cmps357.pa2solution.ciphers;
+
+import cmps357.pa2solution.utils.CipherUtils;
+
 /**
  * Implementation of the Affine cipher
  * Uses the formula: E(x) = (ax + b) mod m

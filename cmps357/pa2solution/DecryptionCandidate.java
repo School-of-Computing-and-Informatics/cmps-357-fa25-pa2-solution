@@ -1,3 +1,7 @@
+package cmps357.pa2solution;
+
+import cmps357.pa2solution.heuristics.*;
+
 /**
  * Represents a decryption candidate with its score and metadata
  */
