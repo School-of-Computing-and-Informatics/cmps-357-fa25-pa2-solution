@@ -1,3 +1,5 @@
+package cmps357.pa2solution.heuristics;
+
 import java.util.HashSet;
 import java.util.Set;
 import java.util.StringTokenizer;

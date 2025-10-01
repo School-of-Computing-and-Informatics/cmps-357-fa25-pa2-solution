@@ -1,3 +1,7 @@
+package cmps357.pa2solution.ciphers;
+
+import cmps357.pa2solution.utils.CipherUtils;
+
 /**
  * Implementation of the Vigenère cipher
  * Uses a repeating key to shift characters by different amounts

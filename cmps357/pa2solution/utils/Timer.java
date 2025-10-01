@@ -1,3 +1,5 @@
+package cmps357.pa2solution.utils;
+
 /**
  * Timing utility for tracking elapsed time during cipher processing
  */

@@ -1,3 +1,5 @@
+package cmps357.pa2solution.utils;
+
 /**
  * Utility class for cipher operations
  * Contains the alphabet and common utility functions for cipher implementations

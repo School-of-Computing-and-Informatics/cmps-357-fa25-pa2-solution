@@ -1,3 +1,5 @@
+package cmps357.pa2solution.utils;
+
 /**
  * Progress bar utility for showing cipher search progress
  * Displays a 60-character progress bar with format [====...====]

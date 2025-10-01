@@ -1,3 +1,8 @@
+package cmps357.pa2solution;
+
+import cmps357.pa2solution.ciphers.*;
+import cmps357.pa2solution.utils.*;
+
 /**
  * Main class to test cipher implementations
  * Tests Caesar and Vigenère ciphers with various keys and lorem ipsum text

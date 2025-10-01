@@ -1,3 +1,9 @@
+package cmps357.pa2solution;
+
+import cmps357.pa2solution.ciphers.*;
+import cmps357.pa2solution.heuristics.*;
+import cmps357.pa2solution.utils.*;
+
 import java.io.*;
 import java.nio.file.*;
 import java.util.*;
@@ -281,7 +287,7 @@ public class BruteForceSearch {
     public static List<DecryptionCandidate> processFile(String fileName, String content, Map<String, Long> fileTimings, int numThreads) {
         System.out.println("Processing file: " + fileName + " (length: " + content.length() + ")");
         
-        Timer fileTimer = new Timer();
+        cmps357.pa2solution.utils.Timer fileTimer = new cmps357.pa2solution.utils.Timer();
         fileTimer.start();
         
         List<DecryptionCandidate> allCandidates = new ArrayList<>();
@@ -387,7 +393,7 @@ public class BruteForceSearch {
         System.out.println("Using " + numThreads + " threads for parallel processing");
         System.out.println();
         
-        Timer totalTimer = new Timer();
+        cmps357.pa2solution.utils.Timer totalTimer = new cmps357.pa2solution.utils.Timer();
         totalTimer.start(); // Record t_total_start
         
         try {
